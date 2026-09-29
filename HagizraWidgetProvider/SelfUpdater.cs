@@ -19,7 +19,7 @@ namespace HagizraWidgetProvider
     /// </summary>
     internal static class SelfUpdater
     {
-        public const string DefaultFeed = "https://github.com/Y-PLONI/HagizraWidget/releases/latest/download/HagizraWidget.appinstaller";
+        public const string DefaultFeed = "https://github.com/Y-PLONI/hagizra-widget/releases/latest/download/HagizraWidget.appinstaller";
 
         public enum Result { Updated, UpToDate, Failed }
 
