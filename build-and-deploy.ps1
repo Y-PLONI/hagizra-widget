@@ -1,46 +1,16 @@
-# Builds the provider and registers it as a loose (unsigned) package for local use.
-# Needs Visual Studio 2022 (its MSBuild has the packaging tasks WindowsAppSDK requires) and Developer Mode.
+# Builds the package layout and registers it as a loose (unsigned) package for local use. Needs Developer Mode.
 param(
     [ValidateSet('x64', 'x86', 'ARM64')]
     [string]$Platform = 'x64'
 )
 
 $ErrorActionPreference = 'Stop'
-$root = $PSScriptRoot
-$rid = @{ x64 = 'win-x64'; x86 = 'win-x86'; ARM64 = 'win-arm64' }[$Platform]
-$layout = Join-Path $root "artifacts\layout\$Platform"
-
-$msbuild = & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" `
-    -latest -requires Microsoft.Component.MSBuild -find 'MSBuild\**\Bin\MSBuild.exe' | Select-Object -First 1
-if (-not $msbuild) { throw 'Visual Studio 2022 with MSBuild was not found.' }
+$layout = Join-Path $PSScriptRoot "artifacts\layout\$Platform"
 
 # A running provider or notifier locks its exe; Windows starts the provider again on the next widget activation.
 Get-Process HagizraWidgetProvider -ErrorAction SilentlyContinue | Stop-Process -Force
 
-if (Test-Path $layout) { Remove-Item $layout -Recurse -Force }
-$publishDir = Join-Path $layout 'HagizraWidgetProvider'
-
-& $msbuild (Join-Path $root 'HagizraWidgetProvider\HagizraWidgetProvider.csproj') -restore -t:Publish `
-    -p:Configuration=Release -p:RuntimeIdentifier=$rid -p:SelfContained=true "-p:PublishDir=$publishDir\" -v:minimal
-if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
-
-Copy-Item (Join-Path $root 'Package\ProviderAssets') (Join-Path $layout 'ProviderAssets') -Recurse
-Copy-Item (Join-Path $root 'Package\Public') (Join-Path $layout 'Public') -Recurse
-(Get-Content (Join-Path $root 'Package\AppxManifest.template.xml') -Raw -Encoding utf8).Replace('@ARCH@', $Platform.ToLower()) |
-    Set-Content (Join-Path $layout 'AppxManifest.xml') -Encoding utf8
-
-# Resource index for the images, like a Visual Studio build produces; only the asset folders are indexed, not the runtime.
-$makepri = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter makepri.exe -ErrorAction SilentlyContinue |
-    Where-Object { $_.FullName -match '\\x64\\' } | Sort-Object FullName -Descending | Select-Object -First 1
-if (-not $makepri) { throw 'makepri.exe (Windows SDK) was not found.' }
-$priStage = Join-Path $root 'artifacts\pri-stage'
-if (Test-Path $priStage) { Remove-Item $priStage -Recurse -Force }
-New-Item -ItemType Directory -Force $priStage | Out-Null
-Copy-Item (Join-Path $root 'Package\ProviderAssets') (Join-Path $priStage 'ProviderAssets') -Recurse
-$priConfig = Join-Path $priStage 'priconfig.xml'
-& $makepri.FullName createconfig /cf $priConfig /dq he-IL /pv 10.0.0 /o | Out-Null
-& $makepri.FullName new /pr $priStage /cf $priConfig /mn (Join-Path $layout 'AppxManifest.xml') /of (Join-Path $layout 'resources.pri') /o | Out-Null
-if ($LASTEXITCODE -ne 0) { throw 'makepri failed.' }
+& (Join-Path $PSScriptRoot 'tools\build-layout.ps1') -Platform $Platform -Layout $layout
 
 # Registering another layout under the same identity keeps the old one, so remove it first.
 $existing = Get-AppxPackage HagizraWidget

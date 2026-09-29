@@ -11,13 +11,13 @@
 
   <Identity
     Name="HagizraWidget"
-    Publisher="CN=HagizraWidget"
+    Publisher="CN=Y-PLONI"
     Version="1.0.0.0"
     ProcessorArchitecture="@ARCH@" />
 
   <Properties>
     <DisplayName>הגזרה</DisplayName>
-    <PublisherDisplayName>HagizraWidget</PublisherDisplayName>
+    <PublisherDisplayName>Y-PLONI</PublisherDisplayName>
     <Logo>ProviderAssets\StoreLogo.png</Logo>
   </Properties>
 
