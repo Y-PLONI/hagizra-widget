@@ -55,25 +55,26 @@ Save-Icon 'Square150x150Logo.png' 150 150
 Save-Icon 'Wide310x150Logo.png' 310 150
 Save-Icon 'WidgetIcon.png' 256 256
 
-# Widget picker preview: a mock of the medium card.
-$bmp, $g = New-Canvas 664 316
-$g.Clear([System.Drawing.Color]::FromArgb(255, 32, 32, 32))
+# Widget picker preview: the medium card, 300x304 with transparent rounded corners, as the picker requires.
+$bmp, $g = New-Canvas 300 304
+$g.Clear([System.Drawing.Color]::Transparent)
+$card = Get-RoundedPath 0 0 300 304 12
+$g.FillPath((New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 32, 32, 32))), $card)
 $fmt = New-Object System.Drawing.StringFormat
 $fmt.FormatFlags = 'DirectionRightToLeft'
 $fmt.Alignment = 'Near'
-$bold = New-Object System.Drawing.Font 'Segoe UI', 20, ([System.Drawing.FontStyle]::Bold), ([System.Drawing.GraphicsUnit]::Pixel)
-$reg = New-Object System.Drawing.Font 'Segoe UI', 20, ([System.Drawing.FontStyle]::Regular), ([System.Drawing.GraphicsUnit]::Pixel)
+$bold = New-Object System.Drawing.Font 'Segoe UI', 15, ([System.Drawing.FontStyle]::Bold), ([System.Drawing.GraphicsUnit]::Pixel)
+$reg = New-Object System.Drawing.Font 'Segoe UI', 15, ([System.Drawing.FontStyle]::Regular), ([System.Drawing.GraphicsUnit]::Pixel)
 $lines = @(
     @('11:11', 'טיסת אל על למיאמי |', 'טיסה חלופית תמריא בשעה 16:50'),
     @('11:04', 'קמפיין בחירות |', 'ראש הממשלה הגיע כעת לאשדוד.'),
     @('10:52', 'שוב |', 'רשות הסחר הבריטית מדווחת על ספינה שנפגעה.')
 )
-$y = 32
+$y = 22
 foreach ($l in $lines) {
-    $r = New-Object System.Drawing.RectangleF 24, $y, 616, 60
-    $g.DrawString("$($l[0]) · ", $reg, [System.Drawing.Brushes]::Gray, $r, $fmt)
-    $g.DrawString("$($l[1])", $bold, [System.Drawing.Brushes]::White, (New-Object System.Drawing.RectangleF 24, $y, 560, 60), $fmt)
-    $g.DrawString("$($l[2])", $reg, [System.Drawing.Brushes]::Gainsboro, (New-Object System.Drawing.RectangleF 24, ($y + 28), 616, 40), $fmt)
+    $g.DrawString($l[0], $reg, [System.Drawing.Brushes]::Gray, (New-Object System.Drawing.RectangleF 16, $y, 268, 22), $fmt)
+    $g.DrawString($l[1], $bold, [System.Drawing.Brushes]::White, (New-Object System.Drawing.RectangleF 16, $y, 224, 22), $fmt)
+    $g.DrawString($l[2], $reg, [System.Drawing.Brushes]::Gainsboro, (New-Object System.Drawing.RectangleF 16, ($y + 22), 268, 40), $fmt)
     $y += 92
 }
 $bmp.Save((Join-Path $out 'WidgetPreview.png'), [System.Drawing.Imaging.ImageFormat]::Png)

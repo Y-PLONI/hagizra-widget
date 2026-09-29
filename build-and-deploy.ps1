@@ -29,6 +29,19 @@ Copy-Item (Join-Path $root 'Package\Public') (Join-Path $layout 'Public') -Recur
 (Get-Content (Join-Path $root 'Package\AppxManifest.template.xml') -Raw -Encoding utf8).Replace('@ARCH@', $Platform.ToLower()) |
     Set-Content (Join-Path $layout 'AppxManifest.xml') -Encoding utf8
 
+# Resource index for the images, like a Visual Studio build produces; only the asset folders are indexed, not the runtime.
+$makepri = Get-ChildItem "${env:ProgramFiles(x86)}\Windows Kits\10\bin" -Recurse -Filter makepri.exe -ErrorAction SilentlyContinue |
+    Where-Object { $_.FullName -match '\\x64\\' } | Sort-Object FullName -Descending | Select-Object -First 1
+if (-not $makepri) { throw 'makepri.exe (Windows SDK) was not found.' }
+$priStage = Join-Path $root 'artifacts\pri-stage'
+if (Test-Path $priStage) { Remove-Item $priStage -Recurse -Force }
+New-Item -ItemType Directory -Force $priStage | Out-Null
+Copy-Item (Join-Path $root 'Package\ProviderAssets') (Join-Path $priStage 'ProviderAssets') -Recurse
+$priConfig = Join-Path $priStage 'priconfig.xml'
+& $makepri.FullName createconfig /cf $priConfig /dq he-IL /pv 10.0.0 /o | Out-Null
+& $makepri.FullName new /pr $priStage /cf $priConfig /mn (Join-Path $layout 'AppxManifest.xml') /of (Join-Path $layout 'resources.pri') /o | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'makepri failed.' }
+
 # Registering another layout under the same identity keeps the old one, so remove it first.
 $existing = Get-AppxPackage HagizraWidget
 if ($existing) { Remove-AppxPackage $existing.PackageFullName }

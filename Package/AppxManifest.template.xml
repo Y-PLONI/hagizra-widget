@@ -40,8 +40,7 @@
         Description="חדשות הגזרה בווידג'ט"
         BackgroundColor="transparent"
         Square150x150Logo="ProviderAssets\Square150x150Logo.png"
-        Square44x44Logo="ProviderAssets\Square44x44Logo.png"
-        AppListEntry="none">
+        Square44x44Logo="ProviderAssets\Square44x44Logo.png">
         <uap:DefaultTile Wide310x150Logo="ProviderAssets\Wide310x150Logo.png" />
       </uap:VisualElements>
 
