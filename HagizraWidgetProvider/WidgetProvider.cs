@@ -56,6 +56,7 @@ namespace HagizraWidgetProvider
             ActiveWidgets[context.Id] = context.Size;
             Visible[context.Id] = 0;
             StartTimer();
+            SelfUpdater.CheckInBackground();
             _ = UpdateWidgetAsync(context.Id, context.Size, force: false, fromTimer: false);
         }
 

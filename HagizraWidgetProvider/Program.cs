@@ -33,11 +33,15 @@ namespace HagizraWidgetProvider
         internal static readonly ManualResetEvent ExitEvent = new(false);
 
         /// <summary>
-        /// One executable, two roles. The manifest starts the COM server with "--com-server"; the optional startup
-        /// task starts it with no arguments, which runs the notification poller (and exits at once when notifications are off).
+        /// One executable, three roles. The manifest starts the COM server with "--com-server"; "--update [feed]" runs one
+        /// update check and exits (0 updated, 10 already up to date, 1 failed); the startup task starts it with no
+        /// arguments, which runs the notification poller (and exits at once when notifications are off).
         /// </summary>
         static int Main(string[] args)
         {
+            if (args.Length >= 1 && args[0] == "--update")
+                return RunUpdate(args.Length >= 2 ? args[1] : null);
+
             bool comServer = args.Any(a => a == "--com-server" || a == "-Embedding" || a.StartsWith("-ServerName", StringComparison.OrdinalIgnoreCase));
             if (comServer)
             {
@@ -46,6 +50,14 @@ namespace HagizraWidgetProvider
             }
             return Notifier.Run();
         }
+
+        static int RunUpdate(string? feed) =>
+            SelfUpdater.RunAsync(feed).GetAwaiter().GetResult() switch
+            {
+                SelfUpdater.Result.Updated => 0,
+                SelfUpdater.Result.UpToDate => 10,
+                _ => 1,
+            };
 
         static void RunServer()
         {
