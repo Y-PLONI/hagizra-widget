@@ -41,7 +41,6 @@ namespace HagizraWidgetProvider
                 WriteToggle(w, "notifications", "התראה על מבזק חדש", settings.Notifications);
                 if (!compact)
                     WriteText(w, "ההתראות כבויות כברירת מחדל. כשהן דלוקות, הגזרה נבדקת פעם בדקה ברקע.", subtle: true);
-                WriteToggle(w, "showAds", "הצג גם פרסומות", settings.ShowAds);
 
                 if (!compact)
                     WriteError(w, error);

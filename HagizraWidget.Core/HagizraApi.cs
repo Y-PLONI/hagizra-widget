@@ -48,7 +48,7 @@ public static class HagizraApi
         var items = new List<NewsItem>(root.GetArrayLength());
         foreach (var m in root.EnumerateArray())
         {
-            if (m.ValueKind != JsonValueKind.Object || GetBool(m, "deleted"))
+            if (m.ValueKind != JsonValueKind.Object || GetBool(m, "deleted") || GetBool(m, "is_ads"))
                 continue;
             if (!m.TryGetProperty("id", out var idElement) || !idElement.TryGetInt64(out long id))
                 continue;
@@ -64,7 +64,6 @@ public static class HagizraApi
                 body,
                 media,
                 IsBreaking: m.TryGetProperty("breakingId", out var b) && b.ValueKind == JsonValueKind.Number && b.GetInt64() > 0,
-                IsAd: GetBool(m, "is_ads"),
                 IsSilent: GetBool(m, "silent")));
         }
 

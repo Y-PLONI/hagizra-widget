@@ -120,7 +120,6 @@ namespace HagizraWidgetProvider
                 var settings = new WidgetSettings
                 {
                     Notifications = SettingsForm.ReadBool(doc.RootElement, "notifications", previous.Notifications),
-                    ShowAds = SettingsForm.ReadBool(doc.RootElement, "showAds", previous.ShowAds),
                 };
 
                 // The notifier reads the saved settings, so they must be on disk before it starts.
@@ -200,7 +199,7 @@ namespace HagizraWidgetProvider
 
                 // All widgets share one cached fetch, so a board open or resize usually costs no network.
                 var snapshot = await NewsService.GetAsync(force).ConfigureAwait(false);
-                string data = FeedLayout.BuildData(snapshot, settings, size);
+                string data = FeedLayout.BuildData(snapshot, size);
 
                 string key = size + "|" + data;
                 if (fromTimer && LastSent.TryGetValue(widgetId, out string? last) && last == key)

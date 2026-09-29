@@ -66,7 +66,7 @@ public class HagizraApiTests
     public void ParsesLiveSampleNewestFirst()
     {
         var items = LoadFixture();
-        Assert.Equal(40, items.Count);
+        Assert.Equal(37, items.Count);
         Assert.True(items.Zip(items.Skip(1)).All(p => p.First.Time >= p.Second.Time));
         Assert.All(items, i => Assert.DoesNotContain("embedded#", i.Body));
         Assert.All(items, i => Assert.DoesNotContain("<span", i.Body));
@@ -75,10 +75,11 @@ public class HagizraApiTests
     }
 
     [Fact]
-    public void FlagsAdsAndBreakingNews()
+    public void DropsAdsAndFlagsBreakingNews()
     {
         var items = LoadFixture();
-        Assert.Equal(3, items.Count(i => i.IsAd));
+        Assert.Equal(37, items.Count);
+        Assert.DoesNotContain(items, i => i.Id is 2300766 or 2300752 or 2300751);
         Assert.Single(items, i => i.IsBreaking);
     }
 

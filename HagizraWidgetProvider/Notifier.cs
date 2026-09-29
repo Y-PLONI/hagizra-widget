@@ -66,7 +66,7 @@ namespace HagizraWidgetProvider
             }
 
             var fresh = snapshot.Items
-                .Where(i => i.Id > last && !i.IsAd && !i.IsSilent)
+                .Where(i => i.Id > last && !i.IsSilent)
                 .OrderBy(i => i.Id)
                 .ToList();
             if (newest > last)

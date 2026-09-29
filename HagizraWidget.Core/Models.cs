@@ -19,7 +19,6 @@ public sealed record NewsItem(
     string Body,
     MediaKind Media,
     bool IsBreaking,
-    bool IsAd,
     bool IsSilent);
 
 public sealed record NewsSnapshot(IReadOnlyList<NewsItem> Items, DateTimeOffset FetchedAt, bool IsStale);
@@ -27,7 +26,6 @@ public sealed record NewsSnapshot(IReadOnlyList<NewsItem> Items, DateTimeOffset 
 public sealed class WidgetSettings
 {
     public bool Notifications { get; set; }
-    public bool ShowAds { get; set; }
 }
 
 internal sealed class CacheFile

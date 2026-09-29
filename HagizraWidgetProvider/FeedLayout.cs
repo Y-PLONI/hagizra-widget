@@ -75,7 +75,7 @@ namespace HagizraWidgetProvider
             return card.Replace("__HEADER__", header ? headerBlock : "").Replace("__SITE__", HagizraApi.SiteUrl);
         }
 
-        public static string BuildData(NewsSnapshot snapshot, WidgetSettings settings, WidgetSize size)
+        public static string BuildData(NewsSnapshot snapshot, WidgetSize size)
         {
             var layout = For(size);
             using var buffer = new MemoryStream(2048);
@@ -88,9 +88,6 @@ namespace HagizraWidgetProvider
                 int count = 0, used = 0;
                 foreach (var item in snapshot.Items)
                 {
-                    if (item.IsAd && !settings.ShowAds)
-                        continue;
-
                     string line = BuildLine(item);
                     int cap = count == 0 ? layout.FirstMaxLines : layout.OtherMaxLines;
                     int remaining = layout.Budget - used;
