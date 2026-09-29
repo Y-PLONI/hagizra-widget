@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Template: build-and-deploy.ps1 fills in @ARCH@ and copies this to the package layout as AppxManifest.xml. -->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap3="http://schemas.microsoft.com/appx/manifest/uap/windows10/3"
+  xmlns:com="http://schemas.microsoft.com/appx/manifest/com/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap uap3 com desktop rescap">
+
+  <Identity
+    Name="HagizraWidget"
+    Publisher="CN=HagizraWidget"
+    Version="1.0.0.0"
+    ProcessorArchitecture="@ARCH@" />
+
+  <Properties>
+    <DisplayName>הגזרה</DisplayName>
+    <PublisherDisplayName>HagizraWidget</PublisherDisplayName>
+    <Logo>ProviderAssets\StoreLogo.png</Logo>
+  </Properties>
+
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+    <PackageDependency Name="Microsoft.WindowsAppRuntime.1.6" MinVersion="6000.318.2304.0" Publisher="CN=Microsoft Corporation, O=Microsoft Corporation, L=Redmond, S=Washington, C=US" />
+  </Dependencies>
+
+  <Resources>
+    <Resource Language="he-IL"/>
+    <Resource Language="en-US"/>
+  </Resources>
+
+  <Applications>
+    <Application Id="App"
+      Executable="HagizraWidgetProvider\HagizraWidgetProvider.exe"
+      EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="הגזרה"
+        Description="חדשות הגזרה בווידג'ט"
+        BackgroundColor="transparent"
+        Square150x150Logo="ProviderAssets\Square150x150Logo.png"
+        Square44x44Logo="ProviderAssets\Square44x44Logo.png"
+        AppListEntry="none">
+        <uap:DefaultTile Wide310x150Logo="ProviderAssets\Wide310x150Logo.png" />
+      </uap:VisualElements>
+
+      <Extensions>
+        <com:Extension Category="windows.comServer">
+          <com:ComServer>
+            <com:ExeServer Executable="HagizraWidgetProvider\HagizraWidgetProvider.exe" Arguments="--com-server" DisplayName="Hagizra Widget Provider">
+              <com:Class Id="5C0D8E3A-7B21-4F6A-9E5D-2A8B1C4D6F90" DisplayName="Hagizra Widget Provider" />
+            </com:ExeServer>
+          </com:ComServer>
+        </com:Extension>
+
+        <!-- Off until the user turns notifications on in the widget settings. -->
+        <desktop:Extension Category="windows.startupTask" Executable="HagizraWidgetProvider\HagizraWidgetProvider.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="HagizraNotifier" Enabled="false" DisplayName="הגזרה - התראות" />
+        </desktop:Extension>
+
+        <uap3:Extension Category="windows.appExtension">
+          <uap3:AppExtension Name="com.microsoft.windows.widgets" DisplayName="הגזרה" Id="HagizraWidgetApp" PublicFolder="Public">
+            <uap3:Properties>
+              <WidgetProvider>
+                <ProviderIcons>
+                  <Icon Path="ProviderAssets\StoreLogo.png" />
+                </ProviderIcons>
+                <Activation>
+                  <CreateInstance ClassId="5C0D8E3A-7B21-4F6A-9E5D-2A8B1C4D6F90" />
+                </Activation>
+                <Definitions>
+                  <Definition Id="Hagizra_News_Widget"
+                    DisplayName="הגזרה"
+                    Description="המבזקים האחרונים מהגזרה"
+                    AllowMultiple="false"
+                    IsCustomizable="true">
+                    <Capabilities>
+                      <Capability>
+                        <Size Name="small" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="medium" />
+                      </Capability>
+                      <Capability>
+                        <Size Name="large" />
+                      </Capability>
+                    </Capabilities>
+                    <ThemeResources>
+                      <Icons>
+                        <Icon Path="ProviderAssets\WidgetIcon.png" />
+                      </Icons>
+                      <Screenshots>
+                        <Screenshot Path="ProviderAssets\WidgetPreview.png" DisplayAltText="תצוגה מקדימה של ווידג'ט הגזרה" />
+                      </Screenshots>
+                    </ThemeResources>
+                  </Definition>
+                </Definitions>
+              </WidgetProvider>
+            </uap3:Properties>
+          </uap3:AppExtension>
+        </uap3:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust" />
+    <Capability Name="internetClient" />
+  </Capabilities>
+</Package>
